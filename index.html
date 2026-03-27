@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CINEVERSE — Premium Streaming</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -37,6 +37,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   cursor: none;
+}
+
+@media (max-width: 768px) {
+  body { cursor: auto; }
 }
 
 /* ══════════════════════════════════════════════
@@ -415,7 +419,9 @@ body::before {
   opacity:.4;
 }
 
-/* ── NAVBAR ── */
+/* ══════════════════════════════════════════════
+   NAVBAR — DESKTOP
+══════════════════════════════════════════════ */
 nav {
   position: fixed;
   top:0; left:0; right:0;
@@ -509,100 +515,236 @@ nav.scrolled::before {
   gap:16px;
 }
 
-.search-wrap { position:relative; display:flex; align-items:center; }
+/* ══════════════════════════════════════════════
+   SEARCH — FIXED: dropdown outside clip context
+══════════════════════════════════════════════ */
+
+/* ── Desktop search wrap ── */
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .search-icon-btn {
-  background:none; border:none;
+  background: none;
+  border: none;
   color: var(--muted);
-  cursor:pointer;
-  padding:8px;
-  display:flex;
-  transition:color .2s;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  transition: color .2s;
+  position: relative;
+  z-index: 2;
 }
 .search-icon-btn:hover { color: var(--cream); }
+
+/* The input field animates in width — NO overflow:hidden so dropdown isn't clipped */
 .search-field {
-  position:absolute;
-  right:0;
-  width:0;
-  overflow:hidden;
+  position: absolute;
+  right: 36px; /* sits left of the icon button */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
   transition: width .4s cubic-bezier(.4,0,.2,1), opacity .3s;
-  opacity:0;
+  opacity: 0;
+  /* NOTE: overflow must NOT be hidden — keep visible so dropdown escapes */
 }
-.search-field.open { width:300px; opacity:1; }
+.search-field.open {
+  width: 280px;
+  opacity: 1;
+}
+
 .search-field input {
-  width:100%;
-  background: var(--ink3);
+  width: 100%;
+  background: rgba(18,18,30,0.98);
   border: 1px solid var(--border2);
   color: var(--cream);
-  padding: 10px 38px 10px 18px;
-  border-radius:6px;
-  font-family:'Outfit',sans-serif;
-  font-size:.85rem;
-  outline:none;
-  letter-spacing:.02em;
+  padding: 10px 36px 10px 16px;
+  border-radius: 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .85rem;
+  outline: none;
+  letter-spacing: .02em;
   transition: border-color .2s;
+  white-space: nowrap;
 }
 .search-field input:focus { border-color: var(--gold); }
 .search-field input::placeholder { color: var(--dim); }
+
 .search-clear-btn {
-  position:absolute; right:10px;
-  background:none; border:none;
-  color:var(--dim); cursor:pointer;
-  display:flex; align-items:center;
-  transition:color .2s;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: color .2s;
 }
-.search-clear-btn:hover { color:var(--cream); }
+.search-clear-btn:hover { color: var(--cream); }
+
+/* ── THE DROPDOWN — absolutely positioned relative to .search-wrap ── */
 .search-dropdown {
-  position:absolute;
-  top:calc(100% + 14px);
-  right:0;
-  width:340px;
+  position: fixed; /* fixed so it's never clipped by any ancestor */
+  top: 76px; /* height of nav */
+  width: 340px;
   background: var(--ink3);
-  border:1px solid var(--border2);
-  border-radius:12px;
-  overflow:hidden;
-  display:none;
-  z-index:200;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(201,168,76,0.05);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 12px;
+  overflow: hidden;
+  display: none;
+  z-index: 9000;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.95), 0 0 0 1px rgba(201,168,76,0.06);
+  animation: dropIn .2s cubic-bezier(.34,1.2,.64,1);
 }
-.search-dropdown.show { display:block; }
+@keyframes dropIn {
+  from { opacity:0; transform: translateY(-8px) scale(.98); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.search-dropdown.show { display: block; }
+
 .search-drop-header {
-  padding:12px 18px;
-  font-size:.7rem;
-  color:var(--dim);
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  border-bottom:1px solid var(--border);
+  padding: 12px 18px;
+  font-size: .7rem;
+  color: var(--dim);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
 }
+
 .search-drop-item {
-  display:flex; align-items:center; gap:14px;
-  padding:12px 18px;
-  cursor:pointer;
-  transition:background .15s;
-  border-bottom:1px solid rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: background .15s;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
 }
-.search-drop-item:hover { background:rgba(201,168,76,0.05); }
-.search-drop-item:last-child { border-bottom:none; }
+.search-drop-item:hover { background: rgba(201,168,76,0.06); }
+.search-drop-item:last-child { border-bottom: none; }
+
 .sdrop-img {
-  width:42px; height:60px;
-  object-fit:cover; border-radius:6px;
-  background:var(--ink4); flex-shrink:0;
+  width: 42px; height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--ink4);
+  flex-shrink: 0;
 }
-.sdrop-info h4 { font-size:.85rem; font-weight:500; margin-bottom:3px; }
-.sdrop-info p { font-size:.73rem; color:var(--muted); }
+.sdrop-info h4 { font-size: .85rem; font-weight: 500; margin-bottom: 3px; }
+.sdrop-info p  { font-size: .73rem; color: var(--muted); }
+
 .sdrop-score {
-  margin-left:auto;
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.1rem;
-  color:var(--gold);
-  font-weight:600;
-  flex-shrink:0;
+  margin-left: auto;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-weight: 600;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
+.sdrop-score svg { fill: var(--gold); }
+
 .search-empty {
-  padding:28px 18px;
-  text-align:center;
-  color:var(--muted);
-  font-size:.85rem;
-  font-style:italic;
+  padding: 28px 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: .85rem;
+  font-style: italic;
+}
+
+/* ── MOBILE SEARCH OVERLAY ── */
+.mobile-search-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(5,5,10,0.98);
+  flex-direction: column;
+  padding: 0;
+}
+.mobile-search-overlay.open { display: flex; }
+
+.mob-search-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--ink2);
+}
+.mob-search-back {
+  background: none;
+  border: none;
+  color: var(--cream);
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mob-search-input-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.mob-search-input {
+  width: 100%;
+  background: var(--ink3);
+  border: 1px solid var(--border2);
+  color: var(--cream);
+  padding: 12px 40px 12px 16px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  letter-spacing: .02em;
+}
+.mob-search-input:focus { border-color: var(--gold); }
+.mob-search-input::placeholder { color: var(--dim); }
+.mob-search-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.mob-search-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.mob-search-label {
+  font-size: .7rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 16px;
+  font-weight: 300;
+}
+.mob-search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+.mob-search-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: .9rem;
+  font-style: italic;
 }
 
 .user-avatar {
@@ -905,6 +1047,7 @@ nav.scrolled::before {
   overflow-x:auto; padding-bottom:10px;
   scroll-behavior:smooth;
   scrollbar-width:none;
+  -webkit-overflow-scrolling: touch;
 }
 .movie-row::-webkit-scrollbar { display:none; }
 
@@ -1107,14 +1250,12 @@ nav.scrolled::before {
 }
 .modal-bg.open .modal-container { transform:scale(1) translateY(0); }
 
-/* ── VIDEO PLAYER AREA ── */
 .modal-video {
   position:relative;
   width:100%; aspect-ratio:16/9;
   background:#000;
 }
 
-/* Poster / thumbnail state */
 .modal-poster-state {
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
@@ -1151,7 +1292,6 @@ nav.scrolled::before {
   color:rgba(245,240,232,0.6); font-weight:400;
 }
 
-/* YouTube iframe embed */
 .modal-yt-frame {
   position:absolute; inset:0;
   width:100%; height:100%;
@@ -1174,7 +1314,6 @@ nav.scrolled::before {
 .modal-x:hover { background:var(--red); border-color:var(--red); }
 .modal-x svg { width:16px; height:16px; }
 
-/* Trailer label badge */
 .trailer-badge {
   position:absolute;
   bottom:14px; left:14px;
@@ -1290,27 +1429,140 @@ footer {
 #blob1 { width:600px; height:600px; background:var(--gold); top:-200px; left:-200px; }
 #blob2 { width:500px; height:500px; background:#1a0030; bottom:-200px; right:-100px; }
 
-@media(max-width:768px){
-  .nav-links { display:none; }
-  .hero-title { font-size:3.2rem; }
-  .hero-indicators { display:none; }
-  .search-field.open { width:220px; }
-  .loader-deco-line { display:none; }
-  .loader-progress-area { width:260px; }
-  .all-videos-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:12px; }
+/* ══════════════════════════════════════════════
+   BOTTOM NAV BAR (MOBILE)
+══════════════════════════════════════════════ */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 900;
+  background: rgba(5,5,10,0.97);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+}
+.bottom-nav-items {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color .2s;
+  border: none;
+  background: none;
+  font-family: 'Outfit', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.bnav-item.active { color: var(--gold); }
+.bnav-item svg { width: 22px; height: 22px; }
+.bnav-label {
+  font-size: .6rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.bnav-active-dot {
+  position: absolute;
+  top: 4px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.bnav-item.active .bnav-active-dot { opacity: 1; }
+
+/* ══════════════════════════════════════════════
+   MOBILE RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #cursor, #cursor-ring { display: none; }
+  .nav-links { display: none; }
+  .bottom-nav { display: block; }
+  nav { height: 60px; padding: 0 16px; }
+  .nav-logo { font-size: 1.35rem; letter-spacing: 4px; gap: 8px; }
+  .nav-logo-icon { width: 28px; height: 28px; font-size: .8rem; }
+  .nav-logo span { display: none; }
+  .search-field { display: none; }
+  .search-icon-btn { padding: 6px; }
+  .hero { min-height: 75vh; height: 75vh; align-items: flex-end; }
+  .hero-canvas .slide { background-position: center top; }
+  .hero-content { padding: 0 16px 100px; max-width: 100%; }
+  .hero-title { font-size: clamp(2.4rem, 9vw, 4rem); letter-spacing: -.5px; margin-bottom: 14px; }
+  .hero-eyebrow { margin-bottom: 14px; }
+  .hero-synopsis {
+    font-size: .85rem; line-height: 1.6; margin-bottom: 22px;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .hero-cta { gap: 10px; }
+  .btn-primary { padding: 12px 22px; font-size: .78rem; }
+  .btn-ghost { padding: 11px 18px; font-size: .78rem; }
+  .hero-indicators { display: none; }
+  .hero-meta-row { gap: 10px; }
+  .genre-section { padding: 24px 16px 0; }
+  .genre-row { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .genre-row::-webkit-scrollbar { display: none; }
+  .gpill { flex-shrink: 0; font-size: .7rem; padding: 7px 16px; }
+  .section { padding: 36px 16px; }
+  .sec-title { font-size: 1.4rem; }
+  .sec-sub { font-size: .65rem; }
+  .mcard { flex: 0 0 140px; border-radius: 6px; }
+  .movie-row { gap: 12px; }
+  .all-videos-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .channels-mosaic { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .ch-card { padding: 20px 14px; }
+  .stars-mosaic { gap: 14px; }
+  .star-card { width: 110px; }
+  .star-img, .star-img-wrap { width: 80px; height: 80px; }
+  .modal-bg { padding: 0; align-items: flex-end; }
+  .modal-container { border-radius: 16px 16px 0 0; max-height: 92vh; transform: translateY(40px); }
+  .modal-bg.open .modal-container { transform: translateY(0); }
+  .modal-body { padding: 20px; }
+  .modal-title { font-size: 1.6rem; }
+  .modal-title-row { flex-direction: column; gap: 14px; }
+  .modal-actions-row { width: 100%; }
+  .mact-btn { flex: 1; justify-content: center; font-size: .72rem; padding: 10px 14px; }
+  .modal-play-btn { width: 60px; height: 60px; }
+  .modal-play-btn svg { width: 22px; height: 22px; }
+  .loader-deco-line { display: none; }
+  .loader-progress-area { width: calc(100% - 64px); max-width: 320px; }
+  footer { flex-direction: column; text-align: center; padding: 28px 16px calc(80px + env(safe-area-inset-bottom)); }
+  #pg-home, #pg-stars, #pg-channels { padding-bottom: 70px; }
+  .mcard-hover {
+    opacity: 1;
+    background: linear-gradient(to top, rgba(5,5,10,0.95) 0%, rgba(5,5,10,0.4) 35%, transparent 60%);
+  }
+  .mcard-htitle { font-size: .9rem; }
+  .mcard-hmeta { margin-bottom: 8px; }
+  .mcard-hplay { padding: 8px; font-size: .7rem; }
+}
+
+@media (max-width: 400px) {
+  .all-videos-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .mcard { flex: 0 0 120px; }
+  .channels-mosaic { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stars-mosaic { gap: 10px; }
+  .star-card { width: 90px; }
+  .star-img, .star-img-wrap { width: 68px; height: 68px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     CINEMATIC LOADING SCREEN
-══════════════════════════════════════════ -->
+<!-- ══ LOADING SCREEN ══ -->
 <div id="loaderScreen">
   <div class="loader-light-sweep"></div>
   <div class="loader-grain"></div>
   <div class="loader-scanlines"></div>
-
   <div class="loader-filmstrip-top">
     <div class="filmstrip-track" id="fstrip1"></div>
     <div class="filmstrip-track" id="fstrip1b"></div>
@@ -1319,10 +1571,8 @@ footer {
     <div class="filmstrip-track filmstrip-bottom-track" id="fstrip2"></div>
     <div class="filmstrip-track filmstrip-bottom-track" id="fstrip2b"></div>
   </div>
-
   <div class="loader-deco-line left"></div>
   <div class="loader-deco-line right"></div>
-
   <div class="loader-center">
     <div class="loader-aperture">
       <div class="aperture-outer"></div>
@@ -1351,12 +1601,10 @@ footer {
         </svg>
       </div>
     </div>
-
     <div class="loader-brand">
       <div class="loader-brand-name">CINEVERSE</div>
       <div class="loader-brand-tagline">Premium Streaming Experience</div>
     </div>
-
     <div class="loader-progress-area">
       <div class="loader-step-label" id="loaderLabel">Curating your collection…</div>
       <div class="loader-bar-container">
@@ -1381,9 +1629,28 @@ footer {
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 
+<!-- ══ MOBILE SEARCH OVERLAY ══ -->
+<div class="mobile-search-overlay" id="mobileSearchOverlay">
+  <div class="mob-search-header">
+    <button class="mob-search-back" onclick="closeMobileSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="mob-search-input-wrap">
+      <input type="text" class="mob-search-input" id="mobSearchInput" placeholder="Search movies, genres, years…" autocomplete="off">
+      <button class="mob-search-clear" id="mobSearchClear" onclick="clearMobSearch()" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mob-search-results" id="mobSearchResults">
+    <div class="mob-search-label">Popular Titles</div>
+    <div class="mob-search-grid" id="mobSearchGrid"></div>
+  </div>
+</div>
+
 <!-- ══ NAVBAR ══ -->
 <nav id="nav">
-  <div class="nav-logo">
+  <div class="nav-logo" onclick="goPage('home', document.querySelector('[data-pg=home]'))">
     <div class="nav-logo-icon">C</div>
     <span>CINEVERSE</span>
   </div>
@@ -1404,19 +1671,50 @@ footer {
   </ul>
 
   <div class="nav-right">
+    <!-- Desktop search — restructured so dropdown is never clipped -->
     <div class="search-wrap" id="swrap">
+      <!-- Input slides in; dropdown is rendered as a separate fixed element -->
       <div class="search-field" id="sfield">
         <input type="text" id="sinput" placeholder="Search titles, genres, years…" autocomplete="off">
         <button class="search-clear-btn" onclick="resetSearch()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="search-dropdown" id="sdrop"></div>
       </div>
-      <button class="search-icon-btn" onclick="toggleSearch()">
+      <button class="search-icon-btn" id="searchIconBtn" onclick="handleSearchClick()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
     </div>
+
+    <!-- Dropdown rendered outside nav so nothing clips it -->
+    <div class="search-dropdown" id="sdrop"></div>
+
     <div class="user-avatar">JD</div>
+  </div>
+</nav>
+
+<!-- ══ BOTTOM NAV (MOBILE) ══ -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-items">
+    <button class="bnav-item active" id="bnav-home" onclick="goPageMobile('home')">
+      <div class="bnav-active-dot"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="bnav-label">Home</span>
+    </button>
+    <button class="bnav-item" id="bnav-search" onclick="openMobileSearch()">
+      <div class="bnav-active-dot"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="bnav-label">Search</span>
+    </button>
+    <button class="bnav-item" id="bnav-stars" onclick="goPageMobile('stars')">
+      <div class="bnav-active-dot"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="bnav-label">Stars</span>
+    </button>
+    <button class="bnav-item" id="bnav-channels" onclick="goPageMobile('channels')">
+      <div class="bnav-active-dot"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
+      <span class="bnav-label">Channels</span>
+    </button>
   </div>
 </nav>
 
@@ -1459,7 +1757,6 @@ footer {
     </div>
   </div>
 
-  <!-- NEW VIDEOS SECTION -->
   <div class="section">
     <div class="sec-head">
       <div class="sec-title-wrap">
@@ -1475,7 +1772,6 @@ footer {
     </div>
   </div>
 
-  <!-- ALL VIDEOS SECTION -->
   <div class="section" style="background:linear-gradient(180deg,transparent,rgba(201,168,76,0.02),transparent);padding-top:60px;padding-bottom:60px;">
     <div class="sec-head">
       <div class="sec-title-wrap">
@@ -1485,12 +1781,11 @@ footer {
     </div>
     <div class="all-videos-grid" id="all-videos-grid"></div>
   </div>
-
 </div>
 
 <!-- ══ STARS PAGE ══ -->
 <div class="page-view" id="pg-stars">
-  <div style="height:90px"></div>
+  <div style="height:70px"></div>
   <div class="section">
     <div class="sec-head">
       <div class="sec-title-wrap">
@@ -1513,7 +1808,7 @@ footer {
 
 <!-- ══ CHANNELS PAGE ══ -->
 <div class="page-view" id="pg-channels">
-  <div style="height:90px"></div>
+  <div style="height:70px"></div>
   <div class="section">
     <div class="sec-head">
       <div class="sec-title-wrap">
@@ -1538,12 +1833,10 @@ footer {
   </div>
 </div>
 
-<!-- ══ MODAL WITH VIDEO PLAYER ══ -->
+<!-- ══ MODAL ══ -->
 <div class="modal-bg" id="modal" onclick="closeOutside(event)">
   <div class="modal-container" id="mbox">
     <div class="modal-video">
-
-      <!-- Poster / thumbnail state -->
       <div class="modal-poster-state" id="mPosterState">
         <img class="modal-poster-bg" id="mPoster" src="" alt="">
         <div class="modal-play-zone" onclick="playTrailer()">
@@ -1553,26 +1846,12 @@ footer {
           <div class="modal-play-label">Watch Trailer</div>
         </div>
       </div>
-
-      <!-- YouTube iframe (shown after clicking play) -->
-      <iframe
-        class="modal-yt-frame"
-        id="mYtFrame"
-        src=""
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-
-      <!-- Trailer badge (shown when playing) -->
-      <div class="trailer-badge" id="mTrailerBadge" style="display:none">
-        ▶ Official Trailer
-      </div>
-
+      <iframe class="modal-yt-frame" id="mYtFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="trailer-badge" id="mTrailerBadge" style="display:none">▶ Official Trailer</div>
       <button class="modal-x" onclick="closeModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-
     <div class="modal-body">
       <div class="modal-title-row">
         <div class="modal-title" id="mTitle"></div>
@@ -1601,8 +1880,7 @@ footer {
 </footer>
 
 <script>
-/* ── DATA ────────────────────────────────────────────────── */
-/* ytId = YouTube trailer video ID for each film */
+/* ── DATA ── */
 const FILMS = [
   { id:0, title:"Interstellar", year:2014, rating:8.7, dur:"2h 49m", cert:"PG-13",
     genres:["sci-fi","drama"], badge:"gold", badgeTxt:"IMDB Top",
@@ -1636,7 +1914,7 @@ const FILMS = [
     ytId:"5xH0HfJHsaY" },
   { id:5, title:"Poor Things", year:2023, rating:8.0, dur:"2h 21m", cert:"R",
     genres:["drama","romance"], badge:"new", badgeTxt:"NEW",
-    desc:"The incredible tale about the fantastical evolution of Bella Baxter, a young woman brought back to life by an eccentric scientist.",
+    desc:"The incredible tale about the fantastic evolution of Bella Baxter, a young woman brought back to life by an eccentric scientist.",
     poster:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80",
     bg:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1800&q=80",
     ytId:"RlbR5N6veqw" },
@@ -1709,31 +1987,22 @@ const CHANNELS = [
   {name:"WB Movies",count:"260+ Films",live:false,bg:"linear-gradient(135deg,#003d6b,#001a30)"}
 ];
 
-/* ══════════════════════════════════════════════
-   LOADER LOGIC
-══════════════════════════════════════════════ */
+/* ── LOADER ── */
 (function initLoader() {
   const posters = FILMS.map(f => f.poster);
   const doubled = [...posters, ...posters, ...posters];
-
   function buildCells() {
-    return doubled.map(src => `
-      <div class="film-cell">
-        <img src="${src}" alt="" loading="lazy" />
-      </div>`).join('');
+    return doubled.map(src => `<div class="film-cell"><img src="${src}" alt="" loading="lazy"/></div>`).join('');
   }
-
   ['fstrip1','fstrip1b'].forEach(id => { document.getElementById(id).innerHTML = buildCells(); });
   ['fstrip2','fstrip2b'].forEach(id => { document.getElementById(id).innerHTML = buildCells(); });
 
   const tickGroup = document.getElementById('tickGroup');
-  const numTicks = 48;
-  for (let i = 0; i < numTicks; i++) {
-    const angle = (i / numTicks) * 360;
+  for (let i = 0; i < 48; i++) {
+    const angle = (i / 48) * 360;
     const rad = angle * Math.PI / 180;
-    const r1 = 50, r2 = 53;
-    const x1 = 60 + r1 * Math.cos(rad), y1 = 60 + r1 * Math.sin(rad);
-    const x2 = 60 + r2 * Math.cos(rad), y2 = 60 + r2 * Math.sin(rad);
+    const x1 = 60 + 50 * Math.cos(rad), y1 = 60 + 50 * Math.sin(rad);
+    const x2 = 60 + 53 * Math.cos(rad), y2 = 60 + 53 * Math.sin(rad);
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', x1); line.setAttribute('y1', y1);
     line.setAttribute('x2', x2); line.setAttribute('y2', y2);
@@ -1750,24 +2019,22 @@ const CHANNELS = [
   const CIRCUMFERENCE = 339.3;
 
   const STEPS = [
-    { to: 18,  label: 'Initialising secure session…' },
-    { to: 35,  label: 'Fetching your watchlist…' },
-    { to: 52,  label: 'Loading film catalogue…' },
-    { to: 67,  label: 'Rendering cinematic assets…' },
-    { to: 81,  label: 'Calibrating playback engine…' },
-    { to: 93,  label: 'Polishing the final frame…' },
-    { to: 100, label: 'Lights, camera, action…' },
+    { to:18,  label:'Initialising secure session…' },
+    { to:35,  label:'Fetching your watchlist…' },
+    { to:52,  label:'Loading film catalogue…' },
+    { to:67,  label:'Rendering cinematic assets…' },
+    { to:81,  label:'Calibrating playback engine…' },
+    { to:93,  label:'Polishing the final frame…' },
+    { to:100, label:'Lights, camera, action…' },
   ];
 
   let current = 0, stepIdx = 0;
-
   function setProgress(val) {
     arc.style.strokeDashoffset = CIRCUMFERENCE - (CIRCUMFERENCE * val / 100);
     fill.style.width = val + '%';
     dot.style.left = val + '%';
     pct.textContent = Math.round(val) + '%';
   }
-
   function runStep() {
     if (stepIdx >= STEPS.length) {
       setTimeout(() => {
@@ -1778,10 +2045,9 @@ const CHANNELS = [
     }
     const step = STEPS[stepIdx++];
     label.style.opacity = '0';
-    setTimeout(() => { label.textContent = step.label; label.style.transition = 'opacity 0.4s'; label.style.opacity = '1'; }, 200);
+    setTimeout(() => { label.textContent = step.label; label.style.transition='opacity 0.4s'; label.style.opacity='1'; }, 200);
     const target = step.to, startVal = current, startTime = performance.now();
     const duration = 380 + Math.random() * 260;
-
     function tick(now) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
@@ -1795,7 +2061,7 @@ const CHANNELS = [
   setTimeout(runStep, 600);
 })();
 
-/* ── HERO SLIDES ─────────────────────────────────────────── */
+/* ── HERO ── */
 const HERO_IDS = [0, 2, 3, 10];
 let hIdx = 0, hTimer;
 
@@ -1831,8 +2097,7 @@ function updateHeroContent(i){
     <div class="dot"></div><span class="hero-year">${f.year}</span>
     <div class="dot"></div><span class="hero-dur">${f.dur}</span>
     <div class="dot"></div><span class="hero-cert">${f.cert}</span>
-    <span class="hero-tag-pill">${f.genres[0].toUpperCase()}</span>
-  `;
+    <span class="hero-tag-pill">${f.genres[0].toUpperCase()}</span>`;
   document.getElementById('heroPlayBtn').onclick = ()=>openModal(HERO_IDS[i]);
   document.getElementById('heroInfoBtn').onclick = ()=>openModal(HERO_IDS[i]);
 }
@@ -1841,9 +2106,7 @@ function startFill(i){
   const el = document.getElementById('ifill-'+i);
   if(el){ el.style.transition='none'; el.style.height='0'; setTimeout(()=>{ el.style.transition='height 5s linear'; el.style.height='100%'; },30); }
 }
-
 function jumpHero(i){ clearInterval(hTimer); setHeroSlide(i); startAutoHero(); }
-
 function setHeroSlide(i){
   document.querySelectorAll('.slide').forEach((s,j)=>s.classList.toggle('active',j===i));
   document.querySelectorAll('.indicator').forEach((el,j)=>{
@@ -1855,12 +2118,11 @@ function setHeroSlide(i){
   startFill(i);
   hIdx = i;
 }
-
 function startAutoHero(){
   hTimer = setInterval(()=>{ hIdx = (hIdx+1)%HERO_IDS.length; setHeroSlide(hIdx); }, 5200);
 }
 
-/* ── CARDS ──────────────────────────────────────────────── */
+/* ── CARDS ── */
 function buildCard(f){
   const badge = f.badge ? `<div class="mcard-badge badge-${f.badge}">${f.badgeTxt}</div>` : '';
   const star = `<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
@@ -1881,13 +2143,10 @@ function buildCard(f){
   </div>`;
 }
 
-/* ── RENDER ─────────────────────────────────────────────── */
+/* ── RENDER ── */
 function renderAll(){
-  // New Videos: films from 2023+ or badge=new, as scrollable row
   const newFilms = FILMS.filter(f => f.year >= 2023 || f.badge === 'new');
   document.getElementById('r-new').innerHTML = newFilms.map(buildCard).join('');
-
-  // All Videos: every film in a grid
   document.getElementById('all-videos-grid').innerHTML = FILMS.map(buildCard).join('');
 
   document.getElementById('actorsGrid').innerHTML = ACTORS.map(a=>`
@@ -1919,48 +2178,55 @@ function renderAll(){
     </div>`).join('');
 
   document.getElementById('r-live').innerHTML = FILMS.slice(3,9).map(buildCard).join('');
+  document.getElementById('mobSearchGrid').innerHTML = FILMS.slice(0,6).map(f=>buildCard(f)).join('');
 }
 
 function shiftRow(id, dir){
   document.getElementById(id).scrollBy({left: dir*460, behavior:'smooth'});
 }
 
+/* ── PAGE NAVIGATION ── */
 function goPage(pg, el){
   document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('visible'));
   document.getElementById('pg-'+pg).classList.add('visible');
   document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
+  window.scrollTo({top:0});
+}
+
+function goPageMobile(pg){
+  document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('visible'));
+  document.getElementById('pg-'+pg).classList.add('visible');
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('bnav-'+pg);
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.classList.toggle('active', a.dataset.pg === pg);
+  });
   window.scrollTo({top:0});
 }
 
 function filterG(g, el){
   document.querySelectorAll('.gpill').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');
-  // Filter both the new row and the all-videos grid
-  ['r-new'].forEach(id=>{
-    document.getElementById(id).querySelectorAll('[data-genres]').forEach(c=>{
-      c.style.display = (g==='all' || c.dataset.genres.includes(g)) ? '' : 'none';
-    });
+  document.getElementById('r-new').querySelectorAll('[data-genres]').forEach(c=>{
+    c.style.display = (g==='all' || c.dataset.genres.includes(g)) ? '' : 'none';
   });
   document.getElementById('all-videos-grid').querySelectorAll('[data-genres]').forEach(c=>{
     c.style.display = (g==='all' || c.dataset.genres.includes(g)) ? '' : 'none';
   });
 }
 
-/* ── VIDEO PLAYER LOGIC ──────────────────────────────────── */
+/* ── VIDEO PLAYER ── */
 let currentFilmId = null;
 
 function openModal(id){
   const f = FILMS[id];
   currentFilmId = id;
-
-  // Reset player to poster state
   resetVideoPlayer();
-
   document.getElementById('mPoster').src = f.bg;
   document.getElementById('mTitle').textContent = f.title;
   document.getElementById('mDesc').textContent = f.desc;
-
   const star = `<svg viewBox="0 0 24 24" fill="#c9a84c" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
   document.getElementById('mMeta').innerHTML = `
     <div class="info-pill">${star}<span style="color:var(--gold);font-weight:600;font-family:'Cormorant Garamond',serif;font-size:1.05rem">${f.rating}</span></div>
@@ -1969,22 +2235,17 @@ function openModal(id){
     <div class="info-separator"></div>
     <div class="info-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>${f.dur}</span></div>
     <div class="info-separator"></div>
-    <div class="info-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>${f.cert}</span></div>
-  `;
+    <div class="info-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>${f.cert}</span></div>`;
   document.getElementById('mGenres').innerHTML = f.genres.map(g=>`<span class="gchip">${g}</span>`).join('');
-
   document.getElementById('modal').classList.add('open');
   document.body.style.overflow='hidden';
 }
 
 function playTrailer(){
   const f = FILMS[currentFilmId];
-  if (!f || !f.ytId) return;
-
-  // Hide poster, show iframe
+  if(!f || !f.ytId) return;
   document.getElementById('mPosterState').classList.add('hidden');
   const frame = document.getElementById('mYtFrame');
-  // autoplay=1, mute=0, rel=0 for clean embed
   frame.src = `https://www.youtube-nocookie.com/embed/${f.ytId}?autoplay=1&rel=0&modestbranding=1&color=white`;
   frame.classList.add('active');
   document.getElementById('mTrailerBadge').style.display = 'block';
@@ -2008,35 +2269,84 @@ function closeModal(){
 function closeOutside(e){ if(e.target.id==='modal') closeModal(); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
-/* ── SEARCH ─────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   SEARCH — FULLY FIXED
+   Root cause: dropdown was inside .search-field
+   which had overflow:hidden + width:0 when closed,
+   clipping the dropdown entirely.
+   Fix: dropdown moved OUTSIDE nav-right, uses
+   position:fixed so it's never clipped.
+══════════════════════════════════════════════ */
+
 let sOpen = false;
+const isMobile = () => window.innerWidth <= 768;
+
+function handleSearchClick(){
+  if(isMobile()){
+    openMobileSearch();
+  } else {
+    toggleSearch();
+  }
+}
+
 function toggleSearch(){
   sOpen = !sOpen;
-  document.getElementById('sfield').classList.toggle('open', sOpen);
-  if(sOpen) setTimeout(()=>document.getElementById('sinput').focus(), 380);
-  else resetSearch();
+  const field = document.getElementById('sfield');
+  const drop  = document.getElementById('sdrop');
+  field.classList.toggle('open', sOpen);
+  if(sOpen){
+    setTimeout(()=>{ document.getElementById('sinput').focus(); }, 380);
+  } else {
+    resetSearch();
+  }
 }
+
 function resetSearch(){
   document.getElementById('sinput').value = '';
-  document.getElementById('sdrop').classList.remove('show');
-  document.getElementById('sdrop').innerHTML = '';
-}
-document.getElementById('sinput').addEventListener('input', function(){
-  const q = this.value.trim().toLowerCase();
   const drop = document.getElementById('sdrop');
-  if(!q){ drop.classList.remove('show'); drop.innerHTML=''; return; }
+  drop.classList.remove('show');
+  drop.innerHTML = '';
+}
+
+/* Position the fixed dropdown to align under the search input */
+function positionDropdown(){
+  const field = document.getElementById('sfield');
+  const drop  = document.getElementById('sdrop');
+  const rect  = field.getBoundingClientRect();
+  // Align right edge of dropdown to right edge of input
+  const dropW = 340;
+  const rightEdge = rect.right;
+  const leftPos = Math.max(8, rightEdge - dropW);
+  drop.style.right = (window.innerWidth - rightEdge) + 'px';
+  drop.style.left = 'auto';
+}
+
+function updateDesktopSearchDropdown(){
+  const q = document.getElementById('sinput').value.trim().toLowerCase();
+  const drop = document.getElementById('sdrop');
+
+  if(!q){
+    drop.classList.remove('show');
+    drop.innerHTML = '';
+    return;
+  }
+
   const hits = FILMS.filter(f =>
     f.title.toLowerCase().includes(q) ||
-    f.genres.some(g=>g.includes(q)) ||
-    String(f.year).includes(q)
+    f.genres.some(g => g.includes(q)) ||
+    String(f.year).includes(q) ||
+    f.desc.toLowerCase().includes(q)
   );
-  const star = `<svg viewBox="0 0 24 24" fill="#c9a84c" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+  const star = `<svg viewBox="0 0 24 24" fill="#c9a84c" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
   if(!hits.length){
-    drop.innerHTML = `<div class="search-empty">No titles found for "${q}"</div>`;
+    drop.innerHTML = `<div class="search-empty">No results for "<em>${q}</em>"</div>`;
   } else {
-    drop.innerHTML = `<div class="search-drop-header">${hits.length} title${hits.length>1?'s':''} found</div>`
-      + hits.map(f=>`
-        <div class="search-drop-item" onclick="openModal(${f.id});sOpen=false;document.getElementById('sfield').classList.remove('open');resetSearch();">
+    drop.innerHTML =
+      `<div class="search-drop-header">${hits.length} title${hits.length>1?'s':''} found</div>` +
+      hits.slice(0, 6).map(f => `
+        <div class="search-drop-item" onclick="openModal(${f.id}); closeSearchAfterSelect()">
           <img class="sdrop-img" src="${f.poster}" alt="${f.title}" loading="lazy">
           <div class="sdrop-info">
             <h4>${f.title}</h4>
@@ -2045,22 +2355,126 @@ document.getElementById('sinput').addEventListener('input', function(){
           <div class="sdrop-score">${star}${f.rating}</div>
         </div>`).join('');
   }
+
+  positionDropdown();
   drop.classList.add('show');
-});
-document.addEventListener('click', e=>{
-  if(!document.getElementById('swrap').contains(e.target) && sOpen){
-    sOpen=false;
+}
+
+function closeSearchAfterSelect(){
+  sOpen = false;
+  document.getElementById('sfield').classList.remove('open');
+  resetSearch();
+}
+
+document.getElementById('sinput').addEventListener('input', updateDesktopSearchDropdown);
+
+/* Close dropdown when clicking outside */
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('swrap');
+  const drop = document.getElementById('sdrop');
+  if(!wrap.contains(e.target) && !drop.contains(e.target) && sOpen){
+    sOpen = false;
     document.getElementById('sfield').classList.remove('open');
     resetSearch();
   }
 });
+
+/* Reposition on window resize */
+window.addEventListener('resize', () => {
+  if(sOpen && document.getElementById('sdrop').classList.contains('show')){
+    positionDropdown();
+  }
+});
+
+/* ── Mobile search overlay ── */
+function openMobileSearch(){
+  document.getElementById('mobileSearchOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bnav-search').classList.add('active');
+  setTimeout(()=>{ document.getElementById('mobSearchInput').focus(); }, 100);
+  performMobileSearch();
+}
+
+function closeMobileSearch(){
+  document.getElementById('mobileSearchOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('mobSearchInput').value = '';
+  document.getElementById('mobSearchClear').style.display = 'none';
+  document.getElementById('mobSearchGrid').innerHTML = FILMS.slice(0,6).map(f=>buildCard(f)).join('');
+  document.querySelector('.mob-search-label').textContent = 'Popular Titles';
+  const activePage = document.querySelector('.page-view.visible');
+  if(activePage){
+    const pg = activePage.id.replace('pg-','');
+    document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+    const btn = document.getElementById('bnav-'+pg);
+    if(btn) btn.classList.add('active');
+  }
+}
+
+function clearMobSearch(){
+  document.getElementById('mobSearchInput').value = '';
+  document.getElementById('mobSearchClear').style.display = 'none';
+  document.getElementById('mobSearchGrid').innerHTML = FILMS.slice(0,6).map(f=>buildCard(f)).join('');
+  document.querySelector('.mob-search-label').textContent = 'Popular Titles';
+  document.getElementById('mobSearchInput').focus();
+}
+
+function performMobileSearch(){
+  const q = document.getElementById('mobSearchInput').value.trim().toLowerCase();
+  const grid = document.getElementById('mobSearchGrid');
+  const label = document.querySelector('.mob-search-label');
+  const clearBtn = document.getElementById('mobSearchClear');
+  clearBtn.style.display = q ? 'flex' : 'none';
+  if(!q){
+    label.textContent = 'Popular Titles';
+    grid.innerHTML = FILMS.slice(0,6).map(f=>buildCard(f)).join('');
+    return;
+  }
+  const hits = FILMS.filter(f =>
+    f.title.toLowerCase().includes(q) ||
+    f.genres.some(g=>g.includes(q)) ||
+    String(f.year).includes(q) ||
+    f.desc.toLowerCase().includes(q)
+  );
+  if(!hits.length){
+    label.textContent = `No results for "${q}"`;
+    grid.innerHTML = `<div class="mob-search-empty" style="grid-column:1/-1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.2)" stroke-width="1.5" width="48" height="48" style="display:block;margin:0 auto 16px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Nothing found for <em>"${q}"</em>
+    </div>`;
+  } else {
+    label.textContent = `${hits.length} result${hits.length>1?'s':''} found`;
+    grid.innerHTML = hits.map(f=>`
+      <div class="mcard anim" data-genres="${f.genres.join(',')}" onclick="openModal(${f.id});closeMobileSearch()">
+        ${f.badge ? `<div class="mcard-badge badge-${f.badge}">${f.badgeTxt}</div>` : ''}
+        <img class="mcard-img" src="${f.poster}" alt="${f.title}" loading="lazy">
+        <div class="mcard-hover">
+          <div class="mcard-htitle">${f.title}</div>
+          <div class="mcard-hmeta">
+            <div class="mcard-hrating">
+              <svg viewBox="0 0 24 24" fill="#c9a84c" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ${f.rating}
+            </div>
+            <span>${f.year}</span>
+          </div>
+          <button class="mcard-hplay" onclick="event.stopPropagation();openModal(${f.id});closeMobileSearch()">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play
+          </button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+document.getElementById('mobSearchInput').addEventListener('input', performMobileSearch);
 
 /* ── NAVBAR SCROLL ── */
 window.addEventListener('scroll',()=>{
   document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
 });
 
-/* ── CUSTOM CURSOR ── */
+/* ── CUSTOM CURSOR (desktop only) ── */
 const cur = document.getElementById('cursor');
 const ring = document.getElementById('cursor-ring');
 let mx=0, my=0, rx=0, ry=0;
